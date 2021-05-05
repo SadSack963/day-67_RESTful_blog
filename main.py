@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, jsonify, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -44,6 +44,10 @@ class CreatePostForm(FlaskForm):
     submit = SubmitField("Submit Post")
 
 
+# Get blog posts from database
+posts = db.session.query(BlogPost).all()
+
+
 @app.route('/')
 def get_all_posts():
     return render_template("index.html", all_posts=posts)
@@ -51,11 +55,19 @@ def get_all_posts():
 
 @app.route("/post/<int:index>")
 def show_post(index):
-    requested_post = None
+    # requested_post = None  # Not required when using the return in the if statement
     for blog_post in posts:
-        if blog_post["id"] == index:
+        # id is a Class property - not a dictionary subscript!
+        # if blog_post["id"] == index:  # TypeError: 'BlogPost' object is not subscriptable
+        if blog_post.id == index:
             requested_post = blog_post
-    return render_template("post.html", post=requested_post)
+            return render_template("post.html", post=requested_post)
+    return jsonify(error={"Not Found": "The blog post ID={index} is not in the database!"}), 404
+
+
+@app.route("/edit-post/<int:post_id>")
+def edit_post(post_id):
+    return render_template("edit-post.html")
 
 
 @app.route("/about")
@@ -69,4 +81,4 @@ def contact():
 
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5007)
+    app.run(host='127.0.0.1', port=5007, debug=True)
