@@ -1,4 +1,5 @@
 {% extends 'bootstrap/base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
 {% include "header.html" %}
@@ -22,10 +23,20 @@
       <div class="col-lg-8 col-md-10 mx-auto">
         
           <!-- This is where the form will go -->
+          <form method="post">
+            {{ wtf.quick_form(form, novalidate='True') }}
+          </form>
+
 
       </div>
     </div>
   </div>
+
+  <!-- Include CKEditor Resources -->
+  <!-- load the CKEditor resources from CND (cdn.ckeditor.com) -->
+  {{ ckeditor.load() }}
+  <!-- call ckeditor.config() and pass the CKEditorField attribute’s name -->
+  {{ ckeditor.config(name='body') }}
 
 {% include "footer.html" %}
 {% endblock %}
