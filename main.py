@@ -44,24 +44,19 @@ class CreatePostForm(FlaskForm):
     submit = SubmitField("Submit Post")
 
 
-# Get blog posts from database
-posts = db.session.query(BlogPost).all()
-
-
 @app.route('/')
 def get_all_posts():
+    # posts = db.session.query(BlogPost).all()
+    posts = BlogPost.query.all()
     return render_template("index.html", all_posts=posts)
 
 
-@app.route("/post/<int:index>")
-def show_post(index):
-    # requested_post = None  # Not required when using the return in the if statement
-    for blog_post in posts:
-        # id is a Class property - not a dictionary subscript!
-        # if blog_post["id"] == index:  # TypeError: 'BlogPost' object is not subscriptable
-        if blog_post.id == index:
-            requested_post = blog_post
-            return render_template("post.html", post=requested_post)
+@app.route("/post/<int:post_id>")
+def show_post(post_id):
+    # requested_post = db.session.query(BlogPost).get(post_id)
+    requested_post = BlogPost.query.get(post_id)
+    if requested_post:
+        return render_template("post.html", post=requested_post)
     return jsonify(error={"Not Found": "The blog post ID={index} is not in the database!"}), 404
 
 
