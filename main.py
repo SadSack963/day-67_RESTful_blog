@@ -73,9 +73,7 @@ def edit_post(post_id):
 @app.route("/new-post/", methods=["GET", "POST"])
 def new_post():
     form = CreatePostForm()
-    if request.method == "GET":
-        return render_template("make-post.html", form=form)
-    else:
+    if form.validate_on_submit():
         # Add new blog to database
         post = BlogPost(
             title=form.title.data,
@@ -83,11 +81,12 @@ def new_post():
             author=form.author.data,
             img_url=form.img_url.data,
             body=form.body.data,
-            date=dt.datetime.today().strftime("%B %d, %Y"),
+            date=dt.date.today().strftime("%B %d, %Y"),
         )
         db.session.add(post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
+    return render_template("make-post.html", form=form)
 
 
 @app.route("/about")

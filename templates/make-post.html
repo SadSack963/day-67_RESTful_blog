@@ -22,11 +22,9 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
         
-          <!-- This is where the form will go -->
-          <form method="post">
-            {{ wtf.quick_form(form, novalidate='True') }}
-          </form>
-
+        <!-- This is where the form will go -->
+        <!-- You can use either novalidate=True or novalidate="True" -->
+        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
 
       </div>
     </div>
