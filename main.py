@@ -65,9 +65,29 @@ def show_post(post_id):
     return jsonify(error={"Not Found": "The blog post ID={index} is not in the database!"}), 404
 
 
-@app.route("/edit-post/<int:post_id>")
+@app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 def edit_post(post_id):
-    return render_template("edit-post.html")
+    post = BlogPost.query.get(post_id)
+    form = CreatePostForm(
+        title=post.title,
+        subtitle=post.subtitle,
+        author=post.author,
+        img_url=post.img_url,
+        body=post.body,
+    )
+    if form.validate_on_submit():
+        # Add new blog to database
+        post = BlogPost(
+            title=form.title.data,
+            subtitle=form.subtitle.data,
+            author=form.author.data,
+            img_url=form.img_url.data,
+            body=form.body.data,
+            date=dt.date.today().strftime("%B %d, %Y"),
+        )
+        db.session.commit()
+        return redirect(url_for("get_all_posts"))
+    return render_template("edit-post.html", form=form)
 
 
 @app.route("/new-post/", methods=["GET", "POST"])
@@ -87,6 +107,14 @@ def new_post():
         db.session.commit()
         return redirect(url_for("get_all_posts"))
     return render_template("make-post.html", form=form)
+
+
+@app.route("/delete/<int:post_id>")
+def delete_post(post_id):
+    post = BlogPost.query.get(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for("get_all_posts"))
 
 
 @app.route("/about")
